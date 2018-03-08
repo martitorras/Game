@@ -24,7 +24,8 @@ int main(int argc, char* argv[]) {
 	SDL_Surface* image;
 	SDL_Surface* image2;
 	SDL_Surface* shot;
-	
+	Mix_Chunk *effect;
+	Mix_Music *music;
 	
 	
 	//srand(time(NULL));
@@ -71,6 +72,18 @@ int main(int argc, char* argv[]) {
 		system("pause");
 		exit(1);
 	}
+	effect = Mix_LoadWAV("Ekran.OGG");
+	if (!effect) {
+		printf("Mix_LoadWAV: %s\n", Mix_GetError());
+		system("pause");
+		exit(1);
+	}
+	music = Mix_LoadMUS("music.mp3");
+	if (!music) {
+		printf("Mix_LoadMUS(\"music.mp3\"): %s\n", Mix_GetError());
+		exit(1);
+		// this might be a critical error...
+	}
 
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, image);
@@ -84,8 +97,12 @@ int main(int argc, char* argv[]) {
 	bool up = false, down = false, right = false, left = false, shooting = false, is_flying = false;
 
 	SDL_Event e;//Qualsevol input del teclat, ratolí... es guarda aqui
-	
+	if (Mix_PlayMusic(music, 1) == -1) {
+		printf("Mix_PlayMusic: %s\n", Mix_GetError());
+		// well, there's no music, but most games don't break without music...
+	}
 	while (!exit) {
+		
 		while (SDL_PollEvent(&e) != 0) {//quan rep un input, ho guarda a l'adreça de mem de e
 			if (e.type == SDL_QUIT || e.key.keysym.sym == SDLK_ESCAPE) exit = true;
 			else if (e.type == SDL_KEYDOWN) {
@@ -96,6 +113,11 @@ int main(int argc, char* argv[]) {
 				if (e.key.keysym.sym == SDLK_SPACE) {
 					shooting = true;
 					is_flying = true;
+					if (Mix_PlayChannel(-1, effect, 0) == -1) {
+						printf("Mix_PlayChannel: %s\n", Mix_GetError());
+						// may be critical error, or maybe just no channels were free.
+						// you could allocated another channel in that case...
+					}
 				}
 			}
 			else if (e.type == SDL_KEYUP) {
@@ -117,6 +139,7 @@ int main(int argc, char* argv[]) {
 		else {
 			if (a < 1200) a += 2;
 			else {
+				
 				a = x + 85;
 				b = y + 100;
 				is_flying = false;
@@ -146,7 +169,8 @@ int main(int argc, char* argv[]) {
 		//hit(x, y, enemies[0].i, enemies[0].j);
 
 	}
-
+	Mix_FreeMusic(music);
+	music = NULL;
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	Mix_CloseAudio();
