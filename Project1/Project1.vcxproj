@@ -70,8 +70,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>D:\Build\SDL_Image\include;D:\Build\SDL\include;I:\Build\SDL_Image\include;I:\Build\SDL\include;G:\Build\SDL_Image\include;G:\Build\SDL\include;C:\Users\martiti\Desktop\Build\SDL_Image\include;C:\Users\martiti\Desktop\Build\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Build\SDL_Image\libx86;D:\Build\SDL\x86;I:\Build\SDL_Image\libx86;I:\Build\SDL\x86;G:\Build\SDL_Image\libx86;G:\Build\SDL\x86;C:\Users\martiti\Desktop\Build\SDL_Image\libx86;C:\Users\martiti\Desktop\Build\SDL\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\martiti\Desktop\Game\SDL_Mixer\include;C:\Users\martiti\Desktop\Game\SDL_Image\include;C:\Users\martiti\Desktop\Game\SDL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\martiti\Desktop\Game\SDL_Mixer\libx86;C:\Users\martiti\Desktop\Game\SDL_Image\libx86;C:\Users\martiti\Desktop\Game\SDL\x86;D:\Build\SDL_Image\libx86;D:\Build\SDL\x86;I:\Build\SDL_Image\libx86;I:\Build\SDL\x86;G:\Build\SDL_Image\libx86;G:\Build\SDL\x86;C:\Users\martiti\Desktop\Build\SDL_Image\libx86;C:\Users\martiti\Desktop\Build\SDL\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

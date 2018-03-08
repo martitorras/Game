@@ -1,3 +1,6 @@
 ﻿  Source.cpp
+c:\users\martiti\desktop\game\project1\source.cpp(38): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\martiti\desktop\game\project1\source.cpp(215): warning C4838: conversion from 'float' to 'int' requires a narrowing conversion
+c:\users\martiti\desktop\game\project1\source.cpp(215): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
   Project1.vcxproj -> C:\Users\martiti\Desktop\Game\Debug\Project1.exe
   Project1.vcxproj -> C:\Users\martiti\Desktop\Game\Debug\Project1.pdb (Partial PDB)

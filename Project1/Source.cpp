@@ -1,5 +1,5 @@
 #include <iostream>
-//#include <time.h>
+#include <time.h>
 #include "../SDL/include/SDL.h"
 #include "../SDL_Image/include/SDL_image.h"
 #include "../SDL_Mixer/include/SDL_mixer.h"
@@ -13,7 +13,8 @@ using namespace std;
 //void hit(int a, int b, int c, int d);
 
 typedef struct {
-	int j, i;
+	int j;
+	float i;
 	bool shot;
 }enemy;
 
@@ -24,11 +25,17 @@ int main(int argc, char* argv[]) {
 	SDL_Surface* image;
 	SDL_Surface* image2;
 	SDL_Surface* shot;
-	Mix_Chunk *effect;
-	Mix_Music *music;
+	SDL_Surface* enmy;
+	SDL_Surface* studio;
+	SDL_Surface* ending;
+	Mix_Chunk* effect;
+	Mix_Chunk* death;
+	Mix_Chunk* crash;
+	Mix_Chunk* OHNO;
+	Mix_Music* music;
 	
 	
-	//srand(time(NULL));
+	srand(time(NULL));
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {//inicialitza SDL
 		printf("SDL coud not be initialized! SDL_Error: %s\n", SDL_GetError());
@@ -72,7 +79,43 @@ int main(int argc, char* argv[]) {
 		system("pause");
 		exit(1);
 	}
+	ending = IMG_Load("end.png");
+	if (!image) {
+		printf("IMG_Load: %s\n", IMG_GetError());
+		system("pause");
+		exit(1);
+	}
+	enmy = IMG_Load("jarjar.png");
+	if (!image) {
+		printf("IMG_Load: %s\n", IMG_GetError());
+		system("pause");
+		exit(1);
+	}
+	studio = IMG_Load("LF.png");
+	if (!image) {
+		printf("IMG_Load: %s\n", IMG_GetError());
+		system("pause");
+		exit(1);
+	}
 	effect = Mix_LoadWAV("Ekran.OGG");
+	if (!effect) {
+		printf("Mix_LoadWAV: %s\n", Mix_GetError());
+		system("pause");
+		exit(1);
+	}
+	death = Mix_LoadWAV("death.OGG");
+	if (!effect) {
+		printf("Mix_LoadWAV: %s\n", Mix_GetError());
+		system("pause");
+		exit(1);
+	}
+	crash = Mix_LoadWAV("crash.OGG");
+	if (!effect) {
+		printf("Mix_LoadWAV: %s\n", Mix_GetError());
+		system("pause");
+		exit(1);
+	}
+	OHNO = Mix_LoadWAV("OHNO.OGG");
 	if (!effect) {
 		printf("Mix_LoadWAV: %s\n", Mix_GetError());
 		system("pause");
@@ -89,8 +132,11 @@ int main(int argc, char* argv[]) {
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, image);
 	SDL_Texture* background = SDL_CreateTextureFromSurface(renderer, image2);
 	SDL_Texture* shoot = SDL_CreateTextureFromSurface(renderer, shot);
+	SDL_Texture* foes = SDL_CreateTextureFromSurface(renderer, enmy);
+	SDL_Texture* LF = SDL_CreateTextureFromSurface(renderer, studio);
+	SDL_Texture* finale = SDL_CreateTextureFromSurface(renderer, ending);
 	bool exit = false;//pel bucle
-	int x = 440, y = 260, a = 525, b = 350;
+	int x = 440, y = 260, a = 525, b = 350, aux = 0;
 	enemy enemies[3];
 	enemies[0].i = 1080;
 	enemies[0].j = 250;
@@ -99,7 +145,7 @@ int main(int argc, char* argv[]) {
 	SDL_Event e;//Qualsevol input del teclat, ratolí... es guarda aqui
 	if (Mix_PlayMusic(music, 1) == -1) {
 		printf("Mix_PlayMusic: %s\n", Mix_GetError());
-		// well, there's no music, but most games don't break without music...
+		exit = true;
 	}
 	while (!exit) {
 		
@@ -115,8 +161,7 @@ int main(int argc, char* argv[]) {
 					is_flying = true;
 					if (Mix_PlayChannel(-1, effect, 0) == -1) {
 						printf("Mix_PlayChannel: %s\n", Mix_GetError());
-						// may be critical error, or maybe just no channels were free.
-						// you could allocated another channel in that case...
+						exit = true;
 					}
 				}
 			}
@@ -145,8 +190,10 @@ int main(int argc, char* argv[]) {
 				is_flying = false;
 			}
 		}
-		--enemies[0].i;
-		if (enemies[0].i < -150) enemies[0].i = 1080;
+
+		if(aux == 0) enemies[0].i -= 0.5;
+		else if (aux == 1) enemies[0].i -= 1;
+		else if (aux == 2) enemies[0].i -= 1.5;
 			
 		SDL_RenderClear(renderer);
 		SDL_Rect target = { 0,0, 1080, 720 };
@@ -159,14 +206,52 @@ int main(int argc, char* argv[]) {
 			SDL_RenderCopy(renderer, shoot, NULL, &shot);
 		}
 		//SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
+		SDL_Rect LFs = { 0, 0, 200, 720 };
+		SDL_RenderCopy(renderer, LF, NULL, &LFs);
 		SDL_Rect rect = { x, y, 200, 200 };
 		//SDL_RenderFillRect(renderer, &rect);
 		SDL_RenderCopy(renderer, texture, NULL, &rect);
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
-		SDL_Rect foe = { enemies[0].i, enemies[0].j, 150, 150 };
-		SDL_RenderFillRect(renderer, &foe);
+
+		SDL_Rect foe1 = { enemies[0].i, enemies[0].j, 150, 100 };
+		SDL_RenderCopy(renderer, foes, NULL, &foe1);
+		//hit(a, b, enemies[0].i, enemies[0].j);
 		SDL_RenderPresent(renderer);
-		//hit(x, y, enemies[0].i, enemies[0].j);
+		if (is_flying && a + 80 < enemies[0].i + 140 && a + 80 > enemies[0].i+40 && b < enemies[0].j + 100 && b > enemies[0].j) {
+			//Mix_FreeMusic(music);
+			//music = NULL;
+			if (Mix_PlayChannel(1, death, 0) == -1) {
+				printf("Mix_PlayChannel: %s\n", Mix_GetError());
+				exit = true;
+			}
+			SDL_Delay(1000);
+			enemies[0].i = 1080;
+			enemies[0].j = rand() % 620;
+			enemies[0].j += 10;
+			aux = rand() % 3;
+		}
+		if (x + 110 < enemies[0].i + 140 && x + 110 > enemies[0].i + 30 && y + 100 < enemies[0].j + 100 && y + 100 > enemies[0].j) {
+			Mix_FreeMusic(music);
+			music = NULL;
+			if (Mix_PlayChannel(0, crash, 0) == -1) {
+				printf("Mix_PlayChannel: %s\n", Mix_GetError());
+				exit = true;
+			}
+			SDL_Delay(2000);
+			exit = true;
+		}
+		if (enemies[0].i + 40 < 200) {
+			SDL_Rect fatal = { 0, 0, 1080, 720 };
+			SDL_RenderCopy(renderer, finale, NULL, &fatal);
+			SDL_RenderPresent(renderer);
+			Mix_FreeMusic(music);
+			music = NULL;
+			if (Mix_PlayChannel(2, OHNO, 0) == -1) {
+				printf("Mix_PlayChannel: %s\n", Mix_GetError());
+				exit = true;
+			}
+			SDL_Delay(5000);
+			exit = true;
+		}
 
 	}
 	Mix_FreeMusic(music);
@@ -181,7 +266,7 @@ int main(int argc, char* argv[]) {
 }
 
 /*void hit(int a, int b, int c, int d) {
-	if (a < c + 150 && a > c && b < d + 150 && b > d) {
+	if (a + 80 < c + 150 && a + 80 > c && b < d + 100 && b > d) {
 		exit(1);
 		system("pause");
 		exit(1);
